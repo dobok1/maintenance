@@ -11,7 +11,8 @@ export const VehicleHeader = () => {
                 <th> Fecha programada </th>
                 <th> Id del vehiculo </th>
                 <th> Km actual </th>
-                <th> Actualizar </th>
+                <th> status </th>
+                <th>  </th>
             </tr>
         </thead>
     )

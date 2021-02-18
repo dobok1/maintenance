@@ -17,3 +17,21 @@ body {
   width: 100px;
   border: 1px solid black; 
 }
+
+.statusVehicule{
+  background-color: rgb(199, 199, 199);
+}
+
+.inputClass {
+  display: flex;
+  width: 300px;
+}
+
+.dateClass {
+  width: 238px;
+}
+
+.bodyClass {
+  margin-left: 10px;
+  margin-right: 10px;
+}

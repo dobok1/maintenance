@@ -1,38 +1,59 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Img } from '../../helpers/Img';
 import { useSelector } from 'react-redux';
-import { useForm } from '../../hooks/useForm';
 import { updateVehicleById } from '../../actions/vehicleAction';
 import { useDispatch } from 'react-redux';
+import DateTimePicker from 'react-datetime-picker';
+import moment from 'moment';
+import Swal from 'sweetalert2';
 
 export const ModalVehicule = () => {
 
-    const { openModal, vehicle } = useSelector(state => state.vehicle);
-    const [ formValues, handleInputChange ] = useForm( {
-        name:'prueba',
-        finalDate: new Date()
-    } );
-
     const dispatch = useDispatch();
+    const { openModal, vehicle } = useSelector(state => state.vehicle);
+    const { id,  _id, status, name: namesaved } = vehicle;
+    const now = moment().minutes(0).seconds(0).add(1, 'hours');
+    const nowPlus1 = now.clone().add(1, 'hours');
+    const [ dateEnd, setDateEnd ] = useState( nowPlus1.toDate() );
 
-    const { name, finalDate } = formValues;
+    const initVehicle = {
+        name: namesaved,
+        estimatedate: nowPlus1.toDate()
+    }
+    const [formValues, setFormValues] = useState(initVehicle);
+    const { name } = formValues;
 
     const isOpenModal = openModal ? 'show' : '';
-    const { image, make, model, description, estimatedate,  id, km, _id } = vehicle;
 
     const onClose = () => {
-        console.log('onClose clicked');
         /* dispatch(setItemSelected({}));
         dispatch(setPerks([])); */
     }
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        console.log('Se ha enviado la info', _id);
-        dispatch(updateVehicleById( _id ));
+        const { name } = formValues;
+        if( !name ){
+            Swal.fire('Aviso','Ingresar nombre','warning');
+            return;
+        }
+        dispatch(updateVehicleById( _id, formValues ));
     }
 
+    const handleInputChange = ({ target }) => {
+        setFormValues({
+            ...formValues,
+            [target.name] : target.value
+        })
+    }
+
+    const handleEstimateDateChange = (e) => {
+        setDateEnd(e);
+        setFormValues({
+            ...formValues,
+            estimatedate: e
+        });
+    }
 
     return (
 
@@ -42,7 +63,7 @@ export const ModalVehicule = () => {
                         <div className="modal-content">
                             <div className="modal-header props">
                                 <h5 className="modal-title modal-title-props" id="exampleModalLabel">
-                                        Update status vehicule
+                                        Actualizar status
                                     {/* { itemDisplay }
                                     <div className="lockContainer" onClick={ handleLockUnLock }>
                                         <Lock state={ lock } className={'lockModal'} classIcon={'lockModalItem'} />
@@ -50,49 +71,57 @@ export const ModalVehicule = () => {
                                 </h5>
                                 <button type="button" onClick={ onClose } className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <div className="modal-body fondo p-0">
+                            <div className="modal-body bodyClass">
                                 <div className="modalPoster">
                                     { 
-                                            <Img 
-                                                width={100 } 
-                                                height={ 100 }
-                                                src={image} 
-                                                alt='c' 
-                                            />                                              
+                                        <Img 
+                                            width={ 100 } 
+                                            height={ 100 }
+                                            src={'assets/car.svg'} 
+                                            alt='car' 
+                                        />                                              
                                     }
                                     
                                 </div>
                                 <form onSubmit={ handleSubmit }>
-                                    Identificador del Vehiculo:
-                                    {id}
+                                    <div className="d-flex">
+                                        Identificador Vehiculo: <span><b>{id}</b></span> 
+                                    </div>
+                                    <div> Status:  <b> { status } </b>  </div>
                                     <hr />
-                                    Nombre:
-                                    <input 
-                                        type="text" 
-                                        placeholder="Ingresar nombre"
-                                        name='name'
-                                        value={ name }
-                                        autoComplete="off"
-                                        onChange={ handleInputChange }
-                                    />
-                                    <hr />
-                                    Fecha de entrega:
-                                    <input 
-                                        type="text" 
-                                        placeholder="Ingresar nombre"
-                                        name='finalDate'
-                                        value={ finalDate }
-                                        autoComplete="off"
-                                        onChange={ handleInputChange }
-                                    />
-                                    <hr />
-                                    <button className="btn m-2">Aceptar</button>
-                                </form>
-                                {/* <div className="props-footer">
-                                        <div className="button_Modal_Container">
-                                
+                                    
+                                    <div className="w-100">
+                                        <div>
+                                            <div className="inputClass">
+                                            Nombre:    
+                                                <input 
+                                                    className="form-control"
+                                                    type="text" 
+                                                    placeholder="Ingresar nombre"
+                                                    name='name'
+                                                    value={ name }
+                                                    autoComplete="off"
+                                                    onChange={ handleInputChange }
+                                                />
+                                            </div>
                                         </div>
-                                </div> */}
+                                        <div className="d-flex">
+                                            Entrega :
+                                            <div className="dateClass">
+                                                <DateTimePicker
+                                                    onChange={ handleEstimateDateChange }
+                                                    value={ dateEnd }
+                                                    className="form-control"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div className="d-flex w-100 justify-content-center">
+
+                                        <button className="btn btn-primary m-2 w-100">Aceptar</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>

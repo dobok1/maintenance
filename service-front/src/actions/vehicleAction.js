@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { types } from '../types/types';
+import Swal from 'sweetalert2';
 
-export const getAllVehicles = async () => {
-
+export const getAllVehicles = () => {
+    return async ( dispatch ) => {
     const url = `${process.env.REACT_APP_API_URL}/vehicle/all`;
     const request = {
         url: url,
@@ -10,23 +11,29 @@ export const getAllVehicles = async () => {
     }
 
     const { data } = await axios( request );
-    return data.data;
+
+        dispatch(getAll(data.data));
+    }
 }
 
-export const updateVehicleById = ( id ) => {
+export const updateVehicleById = ( id, formValues ) => {
     return async ( dispatch ) => {
-
+        const { estimatedate, name } = formValues;
         const url = `${process.env.REACT_APP_API_URL}/vehicle/${id}`;
         const request = {
             url: url,
             method: 'PUT',
             data:{    
                 "status":"maintenance",
-                "estimatedate": "2021/02/27"
+                name,
+                estimatedate
             }
         }
 
         const { data } = await axios( request );
+        dispatch(getAllVehicles());
+        
+        Swal.fire('Aviso','Actualización exitosa','success');
         return data.data;
     }
 }
@@ -42,5 +49,12 @@ export const vehicleSelected = ( vehicle ) => ({
     type: types.vehicleActive,
     payload:{
         vehicle
+    }
+})
+
+export const getAll = ( vehicles ) => ({
+    type: types.getAll,
+    payload:{
+        vehicles
     }
 })
